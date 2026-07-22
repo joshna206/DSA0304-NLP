@@ -1,0 +1,27 @@
+# Import PorterStemmer
+from nltk.stem import PorterStemmer
+
+# Create PorterStemmer object
+stemmer = PorterStemmer()
+
+# List of words
+words = [
+    "running",
+    "playing",
+    "studies",
+    "happily",
+    "connected",
+    "walking",
+    "fishing",
+    "jumped",
+    "computers",
+    "reading"
+]
+
+print("Original Word\tStemmed Word")
+print("--------------------------------")
+
+# Perform stemming
+for word in words:
+    stemmed_word = stemmer.stem(word)
+    print(f"{word}\t\t{stemmed_word}")
