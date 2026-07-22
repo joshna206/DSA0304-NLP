@@ -1,0 +1,28 @@
+# Function to generate plural forms of English nouns
+def pluralize(noun):
+    # Nouns ending with s, x, z, ch, sh
+    if noun.endswith(("s", "x", "z", "ch", "sh")):
+        return noun + "es"
+
+    # Nouns ending with consonant + y
+    elif noun.endswith("y") and noun[-2] not in "aeiou":
+        return noun[:-1] + "ies"
+
+    # Nouns ending with f or fe
+    elif noun.endswith("f"):
+        return noun[:-1] + "ves"
+    elif noun.endswith("fe"):
+        return noun[:-2] + "ves"
+
+    # Default rule
+    else:
+        return noun + "s"
+
+
+# List of nouns
+nouns = ["cat", "bus", "box", "baby", "leaf", "knife", "dog", "church"]
+
+# Generate plural forms
+print("Singular -> Plural")
+for noun in nouns:
+    print(noun, "->", pluralize(noun))
