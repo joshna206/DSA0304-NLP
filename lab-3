@@ -1,0 +1,26 @@
+# Import required libraries
+import nltk
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
+# Download required NLTK data (Run only once)
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+# Sample text
+text = "The children are running, playing, and eating fruits."
+
+# Tokenize the sentence
+words = word_tokenize(text)
+
+# Create lemmatizer object
+lemmatizer = WordNetLemmatizer()
+
+print("Original Word\tLemmatized Word")
+print("--------------------------------")
+
+for word in words:
+    if word.isalpha():   # Ignore punctuation
+        lemma = lemmatizer.lemmatize(word)
+        print(f"{word}\t\t{lemma}")
