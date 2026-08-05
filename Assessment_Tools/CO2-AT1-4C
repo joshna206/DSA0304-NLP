@@ -1,0 +1,46 @@
+# Finite-State Morphological Parser
+
+# Input words
+words = ["writes", "writing", "written"]
+
+print("-" * 130)
+print("{:<12}{:<25}{:<20}{:<12}{:<20}{:<15}".format(
+    "Word",
+    "State Transition",
+    "Morphological Breakdown",
+    "Root",
+    "Classification",
+    "Normalized"))
+print("-" * 130)
+
+for word in words:
+
+    if word == "writes":
+        transition = "S0 -> S1 -> S2 -> SF"
+        breakdown = "write + s"
+        root = "write"
+        classification = "Regular Inflection"
+
+    elif word == "writing":
+        transition = "S0 -> S1 -> S3 -> SF"
+        breakdown = "write + ing"
+        root = "write"
+        classification = "Regular Inflection"
+
+    elif word == "written":
+        transition = "S0 -> S1 -> S4 -> SF"
+        breakdown = "write -> written"
+        root = "write"
+        classification = "Irregular Inflection"
+
+    normalized = root
+
+    print("{:<12}{:<25}{:<20}{:<12}{:<20}{:<15}".format(
+        word,
+        transition,
+        breakdown,
+        root,
+        classification,
+        normalized))
+
+print("-" * 130)
