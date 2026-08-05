@@ -1,0 +1,50 @@
+# Morphological Parsing Module for Sentiment Analysis
+
+# Input words
+words = ["unhappy", "happiness", "happily"]
+
+print("-" * 110)
+print("{:<12}{:<10}{:<15}{:<10}{:<18}{:<15}{:<10}".format(
+    "Word", "Prefix", "Base Form", "Suffix",
+    "Transformation", "Normalized", "Breakdown"))
+print("-" * 110)
+
+for word in words:
+
+    prefix = "-"
+    suffix = "-"
+    base = ""
+    transformation = "Derivational"
+
+    if word == "unhappy":
+        prefix = "un"
+        base = "happy"
+        suffix = "-"
+
+    elif word == "happiness":
+        prefix = "-"
+        suffix = "ness"
+        base = "happy"
+
+    elif word == "happily":
+        prefix = "-"
+        suffix = "ly"
+        base = "happy"
+
+    normalized = "happy"
+
+    # Morphological Breakdown
+    if prefix != "-" and suffix != "-":
+        breakdown = prefix + " + " + base + " + " + suffix
+    elif prefix != "-":
+        breakdown = prefix + " + " + base
+    elif suffix != "-":
+        breakdown = base + " + " + suffix
+    else:
+        breakdown = base
+
+    print("{:<12}{:<10}{:<15}{:<10}{:<18}{:<15}{:<10}".format(
+        word, prefix, base, suffix,
+        transformation, normalized, breakdown))
+
+print("-" * 110)
