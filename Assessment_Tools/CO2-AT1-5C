@@ -1,0 +1,45 @@
+# Porter Stemmer Demonstration
+
+from nltk.stem import PorterStemmer
+
+# Create Porter Stemmer object
+ps = PorterStemmer()
+
+# Input words
+words = ["relational", "relation", "relate"]
+
+print("-" * 120)
+print("{:<15}{:<30}{:<20}{:<20}{:<15}".format(
+    "Word",
+    "Applied Rule(s)",
+    "Intermediate Form",
+    "Final Stem",
+    "Normalized"))
+print("-" * 120)
+
+for word in words:
+
+    # Simulate intermediate forms
+    if word == "relational":
+        rule = "ational → ate, remove e"
+        intermediate = "relate"
+
+    elif word == "relation":
+        rule = "ation → ate, remove e"
+        intermediate = "relate"
+
+    elif word == "relate":
+        rule = "remove final e"
+        intermediate = "relate"
+
+    # Porter Stemmer final output
+    stem = ps.stem(word)
+
+    print("{:<15}{:<30}{:<20}{:<20}{:<15}".format(
+        word,
+        rule,
+        intermediate,
+        stem,
+        stem))
+
+print("-" * 120)
