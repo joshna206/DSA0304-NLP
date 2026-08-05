@@ -1,0 +1,52 @@
+# Morphological Analysis Pipeline
+
+# Input words
+words = ["connected", "connecting", "connection"]
+
+# Morphological rules
+rules = {
+    "ed": "Inflectional",
+    "ing": "Inflectional",
+    "ion": "Derivational"
+}
+
+print("-" * 90)
+print("{:<15}{:<15}{:<15}{:<20}{:<15}".format(
+    "Word", "Root", "Suffix", "Suffix Type", "Normalized"))
+print("-" * 90)
+
+for word in words:
+
+    if word.endswith("ing"):
+        root = word[:-3]
+        suffix = "ing"
+
+    elif word.endswith("ed"):
+        root = word[:-2]
+        suffix = "ed"
+
+    elif word.endswith("ion"):
+        # connection -> connect + ion
+        root = word[:-3]
+
+        # Handle spelling adjustment
+        if root.endswith("connect"):
+            root = "connect"
+        else:
+            root = root + "t"
+
+        suffix = "ion"
+
+    else:
+        root = word
+        suffix = ""
+
+    suffix_type = rules.get(suffix, "Unknown")
+
+    # Normalize to common base form
+    normalized = "connect"
+
+    print("{:<15}{:<15}{:<15}{:<20}{:<15}".format(
+        word, root, suffix, suffix_type, normalized))
+
+print("-" * 90)
