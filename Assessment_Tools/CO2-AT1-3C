@@ -1,0 +1,39 @@
+# Stemming-Based Preprocessing Module
+
+# Input words
+words = ["played", "player", "playing"]
+
+print("-" * 110)
+print("{:<12}{:<12}{:<18}{:<18}{:<18}".format(
+    "Word", "Stem", "Removed Affix",
+    "Transformation", "Normalized"))
+print("-" * 110)
+
+for word in words:
+
+    stem = word
+    affix = "-"
+    transformation = "Unknown"
+
+    if word.endswith("ing"):
+        stem = word[:-3]
+        affix = "ing"
+        transformation = "Inflectional"
+
+    elif word.endswith("ed"):
+        stem = word[:-2]
+        affix = "ed"
+        transformation = "Inflectional"
+
+    elif word.endswith("er"):
+        stem = word[:-2]
+        affix = "er"
+        transformation = "Derivational"
+
+    normalized = stem
+
+    print("{:<12}{:<12}{:<18}{:<18}{:<18}".format(
+        word, stem, affix,
+        transformation, normalized))
+
+print("-" * 110)
