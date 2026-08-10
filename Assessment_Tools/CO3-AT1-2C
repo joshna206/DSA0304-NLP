@@ -1,0 +1,237 @@
+import re
+from collections import Counter
+
+# --------------------------------------------------
+# Corpus
+# --------------------------------------------------
+
+corpus = """
+the student is intelligent
+the student is hardworking
+the student reads books
+the student studies natural language processing
+the teacher is intelligent
+the teacher teaches students
+the teacher reads books
+the student likes machine learning
+the student likes natural language processing
+students learn natural language
+students learn machine learning
+students study computer science
+the computer science student studies hard
+the intelligent student studies every day
+the hardworking student reads books
+the teacher teaches natural language processing
+"""
+
+# --------------------------------------------------
+# Preprocessing
+# --------------------------------------------------
+
+def preprocess(text):
+    text = text.lower()
+    text = re.sub(r"[^a-z\s]", "", text)
+    return text.split()
+
+
+words = preprocess(corpus)
+
+# --------------------------------------------------
+# Counts
+# --------------------------------------------------
+
+unigram = Counter(words)
+
+bigram = Counter(
+    zip(words[:-1], words[1:])
+)
+
+trigram = Counter(
+    zip(words[:-2], words[1:-1], words[2:])
+)
+
+total = len(words)
+
+# --------------------------------------------------
+# Probabilities
+# --------------------------------------------------
+
+def unigram_prob(word):
+    return unigram[word] / total
+
+
+def bigram_prob(w1, w2):
+    if unigram[w1] == 0:
+        return 0
+
+    return bigram[(w1, w2)] / unigram[w1]
+
+
+def trigram_prob(w1, w2, w3):
+    denominator = bigram[(w1, w2)]
+
+    if denominator == 0:
+        return 0
+
+    return trigram[(w1, w2, w3)] / denominator
+
+
+# --------------------------------------------------
+# Unsmoothed prediction
+# --------------------------------------------------
+
+def unsmoothed_prediction(sentence):
+
+    tokens = preprocess(sentence)
+    candidates = []
+
+    for word in unigram:
+
+        if len(tokens) >= 2:
+            p = trigram_prob(
+                tokens[-2],
+                tokens[-1],
+                word
+            )
+        else:
+            p = bigram_prob(tokens[-1], word)
+
+        candidates.append((word, p))
+
+    candidates.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return candidates[:5]
+
+
+# --------------------------------------------------
+# Backoff
+# --------------------------------------------------
+
+def backoff_probability(w1, w2, w3):
+
+    # First try trigram
+    p = trigram_prob(w1, w2, w3)
+
+    if p > 0:
+        return p, "Trigram"
+
+    # Backoff to bigram
+    p = bigram_prob(w2, w3)
+
+    if p > 0:
+        return p, "Bigram"
+
+    # Backoff to unigram
+    p = unigram_prob(w3)
+
+    return p, "Unigram"
+
+
+def backoff_prediction(sentence):
+
+    tokens = preprocess(sentence)
+    candidates = []
+
+    for word in unigram:
+
+        if len(tokens) >= 2:
+            p, source = backoff_probability(
+                tokens[-2],
+                tokens[-1],
+                word
+            )
+        else:
+            p = unigram_prob(word)
+            source = "Unigram"
+
+        candidates.append((word, p, source))
+
+    candidates.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return candidates[:5]
+
+
+# --------------------------------------------------
+# Deleted Interpolation
+# --------------------------------------------------
+
+lambda1 = 0.2
+lambda2 = 0.3
+lambda3 = 0.5
+
+
+def interpolation_probability(w1, w2, w3):
+
+    p1 = unigram_prob(w3)
+
+    p2 = bigram_prob(w2, w3)
+
+    p3 = trigram_prob(w1, w2, w3)
+
+    return (
+        lambda1 * p1 +
+        lambda2 * p2 +
+        lambda3 * p3
+    )
+
+
+def interpolation_prediction(sentence):
+
+    tokens = preprocess(sentence)
+    candidates = []
+
+    for word in unigram:
+
+        if len(tokens) >= 2:
+
+            p = interpolation_probability(
+                tokens[-2],
+                tokens[-1],
+                word
+            )
+
+        else:
+            p = unigram_prob(word)
+
+        candidates.append((word, p))
+
+    candidates.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return candidates[:5]
+
+
+# --------------------------------------------------
+# User Query
+# --------------------------------------------------
+
+query = input(
+    "Enter incomplete sentence: "
+)
+
+print("\n===== UNSMOOTHED MODEL =====")
+
+for word, p in unsmoothed_prediction(query):
+    print(f"{word:15} {p:.4f}")
+
+
+print("\n===== BACKOFF MODEL =====")
+
+for word, p, source in backoff_prediction(query):
+    print(
+        f"{word:15} {p:.4f}  ({source})"
+    )
+
+
+print("\n===== DELETED INTERPOLATION =====")
+
+for word, p in interpolation_prediction(query):
+    print(f"{word:15} {p:.4f}")
