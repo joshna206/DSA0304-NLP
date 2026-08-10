@@ -1,0 +1,202 @@
+import re
+import math
+from collections import Counter
+
+# --------------------------------------------------
+# Training Corpus
+# --------------------------------------------------
+
+train_text = """
+the student is intelligent
+the student is hardworking
+the student reads books
+the student studies natural language processing
+the teacher is intelligent
+the teacher teaches students
+the teacher reads books
+the student likes machine learning
+students learn natural language
+students study computer science
+"""
+
+# --------------------------------------------------
+# Test Corpus
+# --------------------------------------------------
+
+test_text = """
+the student is intelligent
+the teacher reads books
+the student studies natural language
+"""
+
+# --------------------------------------------------
+# Preprocessing
+# --------------------------------------------------
+
+def tokenize(text):
+    text = text.lower()
+    text = re.sub(r"[^a-z\s]", "", text)
+    return text.split()
+
+
+train = tokenize(train_text)
+test = tokenize(test_text)
+
+# --------------------------------------------------
+# N-gram Counts
+# --------------------------------------------------
+
+unigram = Counter(train)
+
+bigram = Counter(
+    zip(train[:-1], train[1:])
+)
+
+trigram = Counter(
+    zip(train[:-2], train[1:-1], train[2:])
+)
+
+total = len(train)
+
+# Vocabulary
+vocab = set(train)
+
+# --------------------------------------------------
+# Laplace smoothing
+# --------------------------------------------------
+
+def smoothed_unigram(word):
+
+    return (
+        unigram[word] + 1
+    ) / (
+        total + len(vocab)
+    )
+
+
+def smoothed_bigram(w1, w2):
+
+    return (
+        bigram[(w1, w2)] + 1
+    ) / (
+        unigram[w1] + len(vocab)
+    )
+
+
+def smoothed_trigram(w1, w2, w3):
+
+    return (
+        trigram[(w1, w2, w3)] + 1
+    ) / (
+        bigram[(w1, w2)] + len(vocab)
+    )
+
+
+# --------------------------------------------------
+# Entropy Calculation
+# --------------------------------------------------
+
+def calculate_entropy(n, smoothing=False):
+
+    log_probability = 0
+    count = 0
+
+    for i, word in enumerate(test):
+
+        if n == 1:
+
+            if smoothing:
+                p = smoothed_unigram(word)
+            else:
+                p = unigram[word] / total
+
+        elif n == 2:
+
+            if i == 0:
+                continue
+
+            if smoothing:
+                p = smoothed_bigram(
+                    test[i-1],
+                    word
+                )
+            else:
+
+                denominator = unigram[
+                    test[i-1]
+                ]
+
+                if denominator == 0:
+                    p = 0
+                else:
+                    p = bigram[
+                        (test[i-1], word)
+                    ] / denominator
+
+        else:
+
+            if i < 2:
+                continue
+
+            if smoothing:
+                p = smoothed_trigram(
+                    test[i-2],
+                    test[i-1],
+                    word
+                )
+            else:
+
+                denominator = bigram[
+                    (test[i-2], test[i-1])
+                ]
+
+                if denominator == 0:
+                    p = 0
+                else:
+                    p = trigram[
+                        (
+                            test[i-2],
+                            test[i-1],
+                            word
+                        )
+                    ] / denominator
+
+        if p == 0:
+            return float("inf")
+
+        log_probability += -math.log2(p)
+        count += 1
+
+    return log_probability / count
+
+
+# --------------------------------------------------
+# Calculate Entropy
+# --------------------------------------------------
+
+print("===== UNSMOOTHED ENTROPY =====")
+
+for n in [1, 2, 3]:
+
+    entropy = calculate_entropy(
+        n,
+        smoothing=False
+    )
+
+    print(
+        f"N={n}: {entropy}"
+    )
+
+
+print("\n===== SMOOTHED ENTROPY =====")
+
+for n in [1, 2, 3]:
+
+    entropy = calculate_entropy(
+        n,
+        smoothing=True
+    )
+
+    print(
+        f"N={n}: {entropy:.4f}"
+    )
