@@ -1,0 +1,204 @@
+import re
+from collections import Counter
+from math import log
+
+# --------------------------------------------------
+# Training Corpus
+# --------------------------------------------------
+
+corpus = """
+the student is intelligent
+the student is hardworking
+the student reads books
+the student studies natural language processing
+the teacher is intelligent
+the teacher teaches students
+the teacher reads books
+the student likes machine learning
+the student likes natural language processing
+students learn natural language
+students learn machine learning
+students study computer science
+the computer science student studies hard
+the intelligent student studies every day
+the hardworking student reads books
+the teacher teaches natural language processing
+"""
+
+test_sentences = [
+    "the student is intelligent",
+    "the student reads books",
+    "the teacher teaches students"
+]
+
+# --------------------------------------------------
+# Preprocessing
+# --------------------------------------------------
+
+def preprocess(text):
+    text = text.lower()
+    text = re.sub(r"[^a-z\s]", "", text)
+    return text.split()
+
+
+words = preprocess(corpus)
+
+# --------------------------------------------------
+# Create N-gram counts
+# --------------------------------------------------
+
+unigram_counts = Counter(words)
+
+bigram_counts = Counter(
+    zip(words[:-1], words[1:])
+)
+
+trigram_counts = Counter(
+    zip(words[:-2], words[1:-1], words[2:])
+)
+
+total_words = len(words)
+
+# --------------------------------------------------
+# Probability Functions
+# --------------------------------------------------
+
+def unigram_probability(word):
+    return unigram_counts[word] / total_words
+
+
+def bigram_probability(w1, w2):
+    if unigram_counts[w1] == 0:
+        return 0
+
+    return bigram_counts[(w1, w2)] / unigram_counts[w1]
+
+
+def trigram_probability(w1, w2, w3):
+    denominator = bigram_counts[(w1, w2)]
+
+    if denominator == 0:
+        return 0
+
+    return trigram_counts[(w1, w2, w3)] / denominator
+
+
+# --------------------------------------------------
+# Next Word Prediction
+# --------------------------------------------------
+
+def predict_next(sentence, n):
+    tokens = preprocess(sentence)
+    predictions = []
+
+    for word in unigram_counts:
+
+        if n == 1:
+            probability = unigram_probability(word)
+
+        elif n == 2:
+            if len(tokens) < 1:
+                probability = 0
+            else:
+                probability = bigram_probability(tokens[-1], word)
+
+        elif n == 3:
+            if len(tokens) < 2:
+                probability = 0
+            else:
+                probability = trigram_probability(
+                    tokens[-2], tokens[-1], word
+                )
+
+        predictions.append((word, probability))
+
+    predictions.sort(key=lambda x: x[1], reverse=True)
+
+    return predictions[:5]
+
+
+# --------------------------------------------------
+# Display Counts
+# --------------------------------------------------
+
+print("===== UNIGRAM COUNTS =====")
+for word, count in unigram_counts.most_common(10):
+    print(word, ":", count)
+
+print("\n===== BIGRAM COUNTS =====")
+for bigram, count in bigram_counts.most_common(10):
+    print(bigram, ":", count)
+
+print("\n===== TRIGRAM COUNTS =====")
+for trigram, count in trigram_counts.most_common(10):
+    print(trigram, ":", count)
+
+
+# --------------------------------------------------
+# User Selection
+# --------------------------------------------------
+
+print("\nSelect N:")
+print("1. Unigram")
+print("2. Bigram")
+print("3. Trigram")
+
+n = int(input("Enter N (1/2/3): "))
+
+sentence = input("Enter incomplete sentence: ")
+
+results = predict_next(sentence, n)
+
+print("\n===== TOP-5 PREDICTIONS =====")
+
+for word, probability in results:
+    print(f"{word:15} Probability = {probability:.4f}")
+
+
+# --------------------------------------------------
+# Demonstrate unseen N-gram
+# --------------------------------------------------
+
+print("\n===== UNSEEN N-GRAM TEST =====")
+
+print(
+    "P(machine | teacher) =",
+    bigram_probability("teacher", "machine")
+)
+
+print(
+    "P(books | student is) =",
+    trigram_probability("student", "is", "books")
+)
+
+
+# --------------------------------------------------
+# Evaluation
+# --------------------------------------------------
+
+print("\n===== TEST SENTENCE EVALUATION =====")
+
+for sentence in test_sentences:
+
+    tokens = preprocess(sentence)
+
+    probability = 1
+    zero_found = False
+
+    for i in range(1, len(tokens)):
+
+        p = bigram_probability(tokens[i-1], tokens[i])
+
+        if p == 0:
+            zero_found = True
+            probability = 0
+            break
+
+        probability *= p
+
+    print(sentence)
+
+    if zero_found:
+        print("Result: Zero probability")
+    else:
+        print("Sentence probability:", probability)
