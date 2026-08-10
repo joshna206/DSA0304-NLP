@@ -1,0 +1,105 @@
+import re
+
+# --------------------------------------------------
+# Lexical Dictionary
+# --------------------------------------------------
+
+lexicon = {
+
+    "the": "DT",
+    "a": "DT",
+    "an": "DT",
+
+    "he": "PRP",
+    "she": "PRP",
+    "they": "PRP",
+    "we": "PRP",
+    "i": "PRP",
+
+    "is": "VBZ",
+    "are": "VBP",
+    "am": "VBP",
+    "was": "VBD",
+    "were": "VBD",
+
+    "and": "CC",
+    "or": "CC",
+    "but": "CC",
+
+    "in": "IN",
+    "on": "IN",
+    "at": "IN",
+    "with": "IN",
+    "from": "IN",
+
+    "student": "NN",
+    "teacher": "NN",
+    "book": "NN",
+    "computer": "NN",
+
+    "study": "VB",
+    "read": "VB",
+    "teach": "VB",
+    "learn": "VB",
+
+    "intelligent": "JJ",
+    "hardworking": "JJ",
+    "beautiful": "JJ",
+
+    "quickly": "RB",
+    "slowly": "RB"
+}
+
+
+# --------------------------------------------------
+# Rule-Based Tagger
+# --------------------------------------------------
+
+def rule_based_tagger(sentence):
+
+    words = sentence.lower().split()
+    result = []
+
+    for word in words:
+
+        # Dictionary lookup
+        if word in lexicon:
+            tag = lexicon[word]
+
+        # Adverb rule
+        elif word.endswith("ly"):
+            tag = "RB"
+
+        # Gerund rule
+        elif word.endswith("ing"):
+            tag = "VBG"
+
+        # Past tense rule
+        elif word.endswith("ed"):
+            tag = "VBD"
+
+        # Adjective rule
+        elif word.endswith(
+            ("ous", "ful", "able", "ive", "al")
+        ):
+            tag = "JJ"
+
+        # Plural noun rule
+        elif word.endswith("s"):
+            tag = "NNS"
+
+        # Default
+        else:
+            tag = "NN"
+
+        result.append((word, tag))
+
+    return result
+
+
+sentence = "The intelligent student studies books quickly"
+
+print("===== RULE BASED TAGGING =====")
+
+for word, tag in rule_based_tagger(sentence):
+    print(word, "->", tag)
