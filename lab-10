@@ -1,0 +1,38 @@
+sentence=[
+    ("I","NOUN"),
+    ("love","NOUN"),
+    ("Python","NOUN"),
+    ("programming","NOUN")
+]
+
+
+print("Before Transformation:")
+
+for word,tag in sentence:
+    print(word,"---->",tag)
+
+
+
+def transform(word,tag):
+
+    if word=="I":
+        tag="PRON"
+
+    elif word=="love":
+        tag="VERB"
+
+    elif word.endswith("ing"):
+        tag="VERB"
+
+    return tag
+
+
+
+print("\nAfter Transformation:")
+
+
+for word,tag in sentence:
+
+    new_tag=transform(word,tag)
+
+    print(word,"---->",new_tag)
