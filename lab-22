@@ -1,0 +1,32 @@
+# Reference Resolution
+
+text = "John went to the shop. He bought a book. He read it."
+
+sentences = text.split(".")
+
+last_person = ""
+last_object = ""
+
+for sentence in sentences:
+
+    words = sentence.strip().split()
+
+    for word in words:
+
+        word = word.lower().strip(".,!?")
+
+        if word == "john":
+            last_person = "John"
+
+        elif word == "book":
+            last_object = "book"
+
+        elif word == "he":
+            if last_person:
+                print("He refers to:", last_person)
+
+        elif word == "it":
+            if last_object:
+                print("It refers to:", last_object)
+
+print("\nReference Resolution Completed.")
