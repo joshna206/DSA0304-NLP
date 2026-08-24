@@ -1,0 +1,39 @@
+# Text Coherence Evaluation
+
+text = """
+Machine learning uses data.
+Data helps computers learn.
+Computers learn patterns from data.
+"""
+
+sentences = []
+
+for sentence in text.strip().split("."):
+    sentence = sentence.strip()
+
+    if sentence:
+        sentences.append(set(sentence.lower().split()))
+
+total_score = 0
+
+for i in range(len(sentences) - 1):
+
+    common_words = sentences[i] & sentences[i + 1]
+
+    score = len(common_words)
+
+    total_score += score
+
+    print("Sentence", i + 1, "and Sentence", i + 2)
+    print("Common words:", common_words)
+    print("Score:", score)
+    print()
+
+coherence_score = total_score / (len(sentences) - 1)
+
+print("Overall Coherence Score:", round(coherence_score, 2))
+
+if coherence_score > 0:
+    print("Text is Coherent")
+else:
+    print("Text is Not Coherent")
