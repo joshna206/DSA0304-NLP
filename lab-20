@@ -1,0 +1,29 @@
+# Syntax-Driven Semantic Analysis
+
+sentence = "The student reads a book."
+
+words = sentence.replace(".", "").split()
+
+determiners = ["the", "a", "an"]
+
+noun_meanings = {
+    "student": "A person who studies",
+    "book": "A written work used for reading",
+    "teacher": "A person who teaches",
+    "car": "A vehicle used for transportation"
+}
+
+print("Sentence:", sentence)
+print("\nNoun Phrases and Meanings:")
+
+for i in range(len(words) - 1):
+
+    determiner = words[i].lower()
+    noun = words[i + 1].lower()
+
+    if determiner in determiners and noun in noun_meanings:
+
+        phrase = words[i] + " " + words[i + 1]
+
+        print("\nNoun Phrase:", phrase)
+        print("Meaning:", noun_meanings[noun])
