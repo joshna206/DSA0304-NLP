@@ -1,0 +1,125 @@
+# Program 5: Probabilistic Context-Free Grammar Parsing
+
+grammar = {
+    "S": [
+        (["NP", "VP"], 1.0)
+    ],
+
+    "NP": [
+        (["Det", "N"], 0.8),
+        (["N"], 0.2)
+    ],
+
+    "VP": [
+        (["V", "NP"], 1.0)
+    ],
+
+    "Det": [
+        (["the"], 0.5),
+        (["a"], 0.5)
+    ],
+
+    "N": [
+        (["cat"], 0.5),
+        (["dog"], 0.5)
+    ],
+
+    "V": [
+        (["sees"], 0.5),
+        (["likes"], 0.5)
+    ]
+}
+
+
+def parse(symbol, words, pos):
+
+    if symbol not in grammar:
+
+        if pos < len(words) and words[pos] == symbol:
+            return [(pos + 1, 1.0, symbol)]
+
+        return []
+
+    results = []
+
+    for rule, probability in grammar[symbol]:
+
+        states = [(pos, probability, [])]
+
+        for item in rule:
+
+            new_states = []
+
+            for current_pos, prob, children in states:
+
+                parsed = parse(item, words, current_pos)
+
+                for next_pos, child_prob, child_tree in parsed:
+
+                    new_states.append(
+                        (
+                            next_pos,
+                            prob * child_prob,
+                            children + [(item, child_tree)]
+                        )
+                    )
+
+            states = new_states
+
+        for final_pos, prob, children in states:
+
+            results.append(
+                (
+                    final_pos,
+                    prob,
+                    (symbol, children)
+                )
+            )
+
+    return results
+
+
+def print_tree(tree, level=0):
+
+    symbol, children = tree
+
+    print("  " * level + symbol)
+
+    for child in children:
+
+        child_symbol, child_tree = child
+
+        if isinstance(child_tree, str):
+            print("  " * (level + 1) + child_tree)
+        else:
+            print_tree(child_tree, level + 1)
+
+
+# Sentence
+sentence = "the cat sees a dog".split()
+
+# Parse
+results = parse("S", sentence, 0)
+
+valid = []
+
+for position, probability, tree in results:
+
+    if position == len(sentence):
+        valid.append((probability, tree))
+
+
+if valid:
+
+    # Select highest probability parse
+    probability, tree = max(valid, key=lambda x: x[0])
+
+    print("Sentence:", " ".join(sentence))
+    print("\nParse Tree:")
+    print_tree(tree)
+
+    print("\nProbability:", probability)
+
+else:
+
+    print("Sentence cannot be parsed.")
