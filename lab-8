@@ -1,0 +1,37 @@
+import random
+
+
+training_data = [
+    ("I","PRON"),
+    ("love","VERB"),
+    ("Python","NOUN"),
+    ("Python","PROPER_NOUN"),
+    ("is","VERB"),
+    ("easy","ADJ")
+]
+
+
+word_tags = {}
+
+for word,tag in training_data:
+
+    if word not in word_tags:
+        word_tags[word] = []
+
+    word_tags[word].append(tag)
+
+
+
+sentence = ["I","love","Python","is","easy"]
+
+
+print("Stochastic POS Tagging:")
+
+for word in sentence:
+
+    if word in word_tags:
+        tag = random.choice(word_tags[word])
+    else:
+        tag = "UNKNOWN"
+
+    print(word,"---->",tag)
