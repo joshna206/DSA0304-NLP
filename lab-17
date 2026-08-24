@@ -1,0 +1,40 @@
+# Program 7: WordNet - Synsets and Word Meanings
+
+wordnet = {
+    "bank": [
+        ("bank.n.01", "the land beside a river"),
+        ("bank.n.02", "a financial institution"),
+        ("bank.v.01", "to deposit money in a bank")
+    ],
+
+    "book": [
+        ("book.n.01", "a written or printed work"),
+        ("book.v.01", "to reserve something")
+    ],
+
+    "computer": [
+        ("computer.n.01", "an electronic machine that processes data")
+    ],
+
+    "dog": [
+        ("dog.n.01", "a domesticated animal kept as a pet")
+    ],
+
+    "student": [
+        ("student.n.01", "a person who studies")
+    ]
+}
+
+word = input("Enter a word: ").lower().strip()
+
+if word in wordnet:
+
+    print("\nWord:", word)
+    print("Synsets and Meanings:")
+
+    for synset, meaning in wordnet[word]:
+        print("\nSynset:", synset)
+        print("Meaning:", meaning)
+
+else:
+    print("\nWord not found in the lexical database.")
