@@ -1,0 +1,30 @@
+# Syntax-Driven Semantic Analysis
+
+sentence = "The student reads a book."
+
+words = sentence.replace(".", "").split()
+
+print("Sentence:", sentence)
+print("\nNoun Phrases:")
+
+for i in range(len(words) - 1):
+
+    if words[i].lower() in ["the", "a", "an"]:
+
+        phrase = words[i] + " " + words[i + 1]
+
+        print("Noun Phrase:", phrase)
+
+        noun = words[i + 1].lower()
+
+        if noun == "student":
+            print("Meaning: A person who studies")
+
+        elif noun == "book":
+            print("Meaning: A written work for reading")
+
+        else:
+            print("Meaning: Object or person")
+
+
+print("\nSemantic Analysis Completed.")
