@@ -1,0 +1,41 @@
+# Word Sense Disambiguation using Lesk Algorithm
+
+senses = {
+    "bank": {
+        "financial": "money deposit account finance loan cash",
+        "river": "river water bank shore land",
+        "building": "bank office building money"
+    }
+}
+
+sentence = input("Enter a sentence: ").lower()
+word = input("Enter the ambiguous word: ").lower()
+
+if word not in senses:
+    print("Word not available.")
+else:
+    sentence_words = set(sentence.split())
+
+    best_sense = None
+    best_score = 0
+
+    for sense, meaning in senses[word].items():
+
+        meaning_words = set(meaning.split())
+
+        common_words = sentence_words.intersection(meaning_words)
+
+        score = len(common_words)
+
+        print(sense, "score:", score)
+
+        if score > best_score:
+            best_score = score
+            best_sense = sense
+
+    if best_sense:
+        print("\nWord:", word)
+        print("Best Sense:", best_sense)
+        print("Score:", best_score)
+    else:
+        print("\nNo matching sense found.")
