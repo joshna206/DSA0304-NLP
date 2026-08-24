@@ -1,0 +1,70 @@
+# Parse Tree for a Context-Free Grammar
+
+grammar = {
+    "S": [["NP", "VP"]],
+    "NP": [["Det", "N"]],
+    "VP": [["V", "NP"]],
+    "Det": [["the"], ["a"]],
+    "N": [["cat"], ["dog"]],
+    "V": [["sees"], ["likes"]]
+}
+
+sentence = "the cat sees a dog".split()
+
+
+def parse(symbol, words, position):
+    if symbol not in grammar:
+        if position < len(words) and words[position] == symbol:
+            return [(position + 1, symbol)]
+        return []
+
+    results = []
+
+    for rule in grammar[symbol]:
+        states = [(position, [])]
+
+        for item in rule:
+            new_states = []
+
+            for pos, children in states:
+                for new_pos, tree in parse(item, words, pos):
+                    new_states.append(
+                        (new_pos, children + [(item, tree)])
+                    )
+
+            states = new_states
+
+        for pos, children in states:
+            results.append((pos, (symbol, children)))
+
+    return results
+
+
+def print_tree(tree, level=0):
+    symbol, children = tree
+
+    print("  " * level + symbol)
+
+    for child in children:
+        if isinstance(child, tuple):
+            child_symbol, child_tree = child
+
+            if isinstance(child_tree, str):
+                print("  " * (level + 1) + child_tree)
+            else:
+                print_tree(child_tree, level + 1)
+
+
+result = parse("S", sentence, 0)
+
+found = False
+
+for position, tree in result:
+    if position == len(sentence):
+        found = True
+        print("Parse Tree:")
+        print_tree(tree)
+        break
+
+if not found:
+    print("Sentence cannot be parsed.")
