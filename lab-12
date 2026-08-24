@@ -1,0 +1,46 @@
+grammar = {
+    "S": [["NP", "VP"]],
+    "NP": [["Det", "N"]],
+    "VP": [["V", "NP"]],
+    "Det": [["the"], ["a"]],
+    "N": [["cat"], ["dog"]],
+    "V": [["sees"], ["likes"]]
+}
+
+sentence = "the cat sees a dog".split()
+n = len(sentence)
+chart = [set() for _ in range(n + 1)]
+
+for rule in grammar["S"]:
+    chart[0].add(("S", tuple(rule), 0, 0))
+
+for i in range(n + 1):
+    changed = True
+    while changed:
+        changed = False
+        for lhs, rhs, dot, start in list(chart[i]):
+            if dot < len(rhs):
+                sym = rhs[dot]
+                if sym in grammar:
+                    for r in grammar[sym]:
+                        item = (sym, tuple(r), 0, i)
+                        if item not in chart[i]:
+                            chart[i].add(item)
+                            changed = True
+                elif i < n and sentence[i] == sym:
+                    item = (lhs, rhs, dot + 1, start)
+                    chart[i + 1].add(item)
+            else:
+                for l2, r2, d2, s2 in list(chart[start]):
+                    if d2 < len(r2) and r2[d2] == lhs:
+                        item = (l2, r2, d2 + 1, s2)
+                        if item not in chart[i]:
+                            chart[i].add(item)
+                            changed = True
+
+accepted = any(
+    lhs == "S" and dot == len(rhs) and start == 0
+    for lhs, rhs, dot, start in chart[n]
+)
+
+print("Accepted" if accepted else "Rejected")
