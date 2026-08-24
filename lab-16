@@ -1,0 +1,34 @@
+# Named Entity Recognition - Simple Python Program
+
+text = "Apple was founded by Steve Jobs in California in 1976."
+
+words = text.replace(".", "").split()
+
+persons = ["Steve Jobs", "Elon Musk", "Bill Gates"]
+organizations = ["Apple", "Microsoft", "Google"]
+locations = ["California", "India", "London", "America"]
+
+print("Named Entities:")
+
+i = 0
+
+while i < len(words):
+
+    word = words[i]
+
+    # Check two-word person names
+    if i + 1 < len(words):
+        two_words = word + " " + words[i + 1]
+
+        if two_words in persons:
+            print(two_words, "-> PERSON")
+            i += 2
+            continue
+
+    if word in organizations:
+        print(word, "-> ORGANIZATION")
+
+    elif word in locations:
+        print(word, "-> LOCATION")
+
+    i += 1
