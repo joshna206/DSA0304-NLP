@@ -1,0 +1,29 @@
+grammar = {
+    "S": [["NP", "VP"]],
+    "NP": [["Det", "N"]],
+    "VP": [["V", "NP"]],
+    "Det": [["the"], ["a"]],
+    "N": [["cat"], ["dog"]],
+    "V": [["sees"], ["likes"]]
+}
+
+def parse(symbol, words, pos):
+    if symbol not in grammar:
+        return [(pos + 1, [symbol])] if pos < len(words) and words[pos] == symbol else []
+
+    results = []
+    for rule in grammar[symbol]:
+        states = [(pos, [])]
+        for sym in rule:
+            new = []
+            for p, tree in states:
+                for np, nt in parse(sym, words, p):
+                    new.append((np, tree + [nt]))
+            states = new
+        results += states
+    return results
+
+sentence = "the cat sees a dog".split()
+result = parse("S", sentence, 0)
+
+print("Accepted" if any(p == len(sentence) for p, _ in result) else "Rejected")
